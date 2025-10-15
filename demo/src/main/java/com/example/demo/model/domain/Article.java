@@ -13,15 +13,23 @@ public class Article {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // 기본 키 1씩 증가
     @Column(name = "id", updatable = false) // 수정 x
     private Long id;
+
     @Column(name = "title", nullable = false) // null x
     private String title = "";
 
     @Column(name = "content", nullable = false)
     private String content = "";
+    
     @Builder // 생성자에 빌더 패턴 적용(불변성)
     public Article(String title, String content){
     this.title = title;
     this.content = content;
         }
+
+    public void update(String title, String content) { // 현재 객체 상태 업데이트
+    this.title = title;
+    this.content = content;
+ }
+       
  }
 
