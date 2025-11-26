@@ -3,53 +3,96 @@ package com.example.demo.controller;
 import com.example.demo.model.domain.Member;
 import com.example.demo.model.service.AddMemberRequest;
 import com.example.demo.model.service.MemberService;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
+import lombok.RequiredArgsConstructor;
+
+import java.util.UUID;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+@RequiredArgsConstructor
 @Controller
 public class MemberController {
-@Autowired
-MemberService memberService;
 
+    private final MemberService memberService;
 
-@GetMapping("/join_new") // 회원 가입 페이지 연결
-public String join_new() {
-return "join_new"; // .HTML 연결
-}
+    // 회원 가입 페이지
+    @GetMapping("/join_new")
+    public String join_new(Model model) {
+        model.addAttribute("request", new AddMemberRequest());
+        return "join_new"; // templates/join_new.html
+    }
 
-@PostMapping("/api/members") // 회원 가입 저장
-public String addmembers(@ModelAttribute AddMemberRequest request) {
-memberService.saveMember(request);
-return "join_end"; // .HTML 연결
- }
+    // 회원 가입 저장
+    @PostMapping("/api/members")
+    public String addmembers(@ModelAttribute("request") @Valid AddMemberRequest request,
+                             BindingResult bindingResult,
+                             Model model) {
 
- @GetMapping("/member_login") // 로그인 페이지 연결
-public String member_login() {
- return "login"; // .HTML 연결
-}
- @PostMapping("/api/login_check") // 로그인(아이디, 패스워드) 체크
-public String checkMembers(@ModelAttribute AddMemberRequest request, Model model) {
- try {
-Member member = memberService.loginCheck(request.getEmail(), request.getPassword()); // 패스워드 반환
-model.addAttribute("member", member); // 로그인 성공 시 회원 정보 전달
-return "redirect:/board_list"; // 로그인 성공 후 이동할 페이지
-} catch (IllegalArgumentException e) {
- model.addAttribute("error", e.getMessage()); // 에러 메시지 전달
-return "login"; // 로그인 실패 시 로그인 페이지로 리다이렉트
-}
- }
- public Member loginCheck(String email, String rawPassword) {
- Member member = memberRepository.findByEmail(email); // 이메일 조회
-if (member == null) {
- throw new IllegalArgumentException("등록되지 않은 이메일입니다.");
- }
- if (!passwordEncoder.matches(rawPassword, member.getPassword())) { // 비밀번호 확인
-throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
- }
- return member; // 인증 성공 시 회원 객체 반환
+        // 검증 실패 시 다시 가입 페이지로
+        if (bindingResult.hasErrors()) {
+            return "join_new";
+        }
+
+        memberService.saveMember(request);
+        return "join_end"; // 가입 완료 페이지 (또는 redirect:/member_login)
+    }
+
+    // 로그인 페이지
+    @GetMapping("/member_login")
+    public String member_login() {
+        return "login"; // templates/login.html
+    }
+
+    // 로그인 체크
+    @PostMapping("/api/login_check")
+    public String checkMembers(@ModelAttribute AddMemberRequest request,
+                               Model model,
+                               HttpServletRequest httpRequest,
+                               HttpServletResponse response) {
+        try {
+            // 1. 기존 세션/쿠키 제거
+            HttpSession session = httpRequest.getSession(false); // 기존 세션(없으면 null)
+            if (session != null) {
+                session.invalidate(); // 기존 세션 무효화
+            }
+
+            // 기존 JSESSIONID 쿠키 삭제
+            Cookie cookie = new Cookie("JSESSIONID", null);
+            cookie.setPath("/");
+            cookie.setMaxAge(0);
+            response.addCookie(cookie);
+
+            // 2. 새 세션 생성
+            session = httpRequest.getSession(true); // 새로운 세션
+
+            // 3. 로그인 검증
+            Member member = memberService.loginCheck(request.getEmail(), request.getPassword());
+
+            // 4. 세션에 값 저장
+            String sessionId = UUID.randomUUID().toString();
+            String email = request.getEmail();
+
+            session.setAttribute("userId", sessionId);
+            session.setAttribute("email", email);
+
+            // (필요하면 model에 member도 넣을 수 있지만 redirect면 어차피 안 쓰임)
+             model.addAttribute("member", member);
+
+            return "redirect:/board_list";        // 로그인 성공 후 이동
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage()); // 에러 메시지 전달
+            return "login"; // 로그인 실패 시 다시 로그인 페이지
+        }
     }
 }
