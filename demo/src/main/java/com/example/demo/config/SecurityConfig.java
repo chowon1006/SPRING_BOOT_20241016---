@@ -27,7 +27,8 @@ public class SecurityConfig {
             )
 
             // CSRF 기본 설정 (폼 전송 사용 시 유지)
-            .csrf(withDefaults())
+            // .csrf(withDefaults())
+            .csrf(csrf -> csrf.disable())
 
             // 세션 관리
             .sessionManagement(session -> session
