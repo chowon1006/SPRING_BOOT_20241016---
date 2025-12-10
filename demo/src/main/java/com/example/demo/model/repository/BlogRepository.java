@@ -1,8 +1,9 @@
- package com.example.demo.model.repository;
- import org.springframework.data.jpa.repository.JpaRepository;
- import org.springframework.stereotype.Repository;
- import com.example.demo.model.domain.Article;
+package com.example.demo.model.repository;
 
- @Repository
- public interface BlogRepository extends JpaRepository<Article, Long>{
- }
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import com.example.demo.model.domain.Article;
+
+@Repository
+public interface BlogRepository extends JpaRepository<Article, Long> {
+}

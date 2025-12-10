@@ -115,8 +115,6 @@ public class BlogController {
         model.addAttribute("startNum", startNum);
         model.addAttribute("email", email); // 로그인 사용자(이메일)
 
-
-        
         model.addAttribute("boards", list.getContent());
         model.addAttribute("totalPages", list.getTotalPages()); // 전체 페이지 수
         model.addAttribute("currentPage", page);                // 현재 페이지 번호
@@ -136,4 +134,4 @@ public class BlogController {
         }
         return "board_view";
     }
-} 
+}

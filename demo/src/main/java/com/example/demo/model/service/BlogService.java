@@ -1,4 +1,5 @@
 package com.example.demo.model.service;
+
 //import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,9 +47,10 @@ public class BlogService {
     }
 
     public Page<Board> findAll(Pageable pageable) {
-    return boardRepository2.findAll(pageable);
+        return boardRepository2.findAll(pageable);
     }
+
     public Page<Board> searchByKeyword(String keyword, Pageable pageable) {
-    return boardRepository2.findByTitleContainingIgnoreCase(keyword, pageable);
+        return boardRepository2.findByTitleContainingIgnoreCase(keyword, pageable);
     } // LIKE 검색 제공(대소문자 무시)
 }

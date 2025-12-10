@@ -87,7 +87,7 @@ public class MemberController {
             session.setAttribute("email", email);
 
             // (필요하면 model에 member도 넣을 수 있지만 redirect면 어차피 안 쓰임)
-             model.addAttribute("member", member);
+            model.addAttribute("member", member);
 
             return "redirect:/board_list";        // 로그인 성공 후 이동
         } catch (IllegalArgumentException e) {
