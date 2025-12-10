@@ -36,9 +36,20 @@ public class BlogController {
         return "board_write";
     }
 
-    // 글쓰기 게시판 저장
+   // 11주차 연습문제 글쓰기 게시판 저장 (작성자 추가)
     @PostMapping("/api/boards")
-    public String addboards(@ModelAttribute AddArticleRequest request) {
+    public String addboards(@ModelAttribute AddArticleRequest request, HttpSession session) {
+        // 1. 세션에서 로그인한 사용자 이메일(ID) 가져오기
+        String email = (String) session.getAttribute("email");
+
+        // 2. 로그인이 안 되어 있다면 로그인 페이지로 리다이렉트 (안전 장치)
+        if (email == null) {
+            return "redirect:/member_login";
+        }
+
+        // 3. DTO에 작성자(user)를 현재 로그인한 이메일로 설정
+        request.setUser(email);
+
         blogService.save(request);
         return "redirect:/board_list";
     }
@@ -87,13 +98,17 @@ public class BlogController {
         return "board_list"; 
     }
 
-    // 게시판 글 상세보기
+    // 11주차 연습문제 게시판 글 상세보기 (로그인 정보 전달)
     @GetMapping("/board_view/{id}")
-    public String boardView(Model model, @PathVariable Long id) {
+    public String boardView(Model model, @PathVariable Long id, HttpSession session) {
         Optional<Board> board = blogService.findById(id);
+        
         if (board.isPresent()) {
-            // ★수정됨★: 뷰 파일(${board.title})과 맞추기 위해 변수명을 "boards" -> "board"로 변경
-            model.addAttribute("board", board.get()); 
+            model.addAttribute("board", board.get());
+            
+            // 현재 로그인한 사용자 아이디(이메일)를 모델에 추가
+            String loginUser = (String) session.getAttribute("email");
+            model.addAttribute("loginUser", loginUser); 
         } else {
             return "/error_page/article_error"; 
         }

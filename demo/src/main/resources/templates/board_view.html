@@ -48,11 +48,13 @@
         <div class="text-right">
             <a class="btn btn-primary" th:href="@{/board_list}">목록으로</a>
             
-            <a class="btn btn-warning" th:href="@{/board_edit/{id}(id=${board.id})}">수정</a>
-            
-            <form th:action="@{/api/board_delete/{id}(id=${board.id})}" method="post" style="display:inline;">
-                <button type="submit" class="btn btn-danger" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
-            </form>
+            <span th:if="${board.user == loginUser}">
+                <a class="btn btn-warning" th:href="@{/board_edit/{id}(id=${board.id})}">수정</a>
+                
+                <form th:action="@{/api/board_delete/{id}(id=${board.id})}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
+                </form>
+            </span>
         </div>
 
     </div>
