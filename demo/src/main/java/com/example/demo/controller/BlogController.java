@@ -134,4 +134,12 @@ public class BlogController {
         }
         return "board_view";
     }
+
+    @GetMapping("/board_edit/{id}") // 게시판 글 수정 페이지 연결
+    public String board_edit(@PathVariable Long id, Model model) {
+        Board board = blogService.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid board Id:" + id));
+            model.addAttribute("board", board);
+            
+            return "board_edit"; // .HTML 연결
+}
 }
