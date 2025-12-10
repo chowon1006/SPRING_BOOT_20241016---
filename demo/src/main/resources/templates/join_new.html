@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>블로그 게시판 (new)</title>
+    <title>회원 가입</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
@@ -39,7 +39,7 @@
 
                         <div class="form-group">
                             <label for="age">나이</label>
-                            <input type="text" th:field="*{age}" class="form-control" placeholder="나이를 입력하세요">
+                            <input type="number" th:field="*{age}" class="form-control" placeholder="나이를 입력하세요">
                             <div class="text-danger" th:if="${#fields.hasErrors('age')}" th:errors="*{age}"></div>
                         </div>
 
@@ -52,6 +52,7 @@
                         <div class="form-group">
                             <label for="address">주소</label>
                             <input type="text" th:field="*{address}" class="form-control" placeholder="주소를 입력하세요">
+                            <div class="text-danger" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></div>
                         </div>
 
                         <div class="text-center mt-4">
@@ -64,5 +65,4 @@
         </div>
     </div>
 </body>
-
 </html>
